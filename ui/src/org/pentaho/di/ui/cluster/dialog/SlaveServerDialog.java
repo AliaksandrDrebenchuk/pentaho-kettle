@@ -525,11 +525,11 @@ public class SlaveServerDialog extends Dialog {
 
       String xml = "<sample/>";
 
-      String reply = slaveServer.sendXML( xml, AddTransServlet.CONTEXT_PATH );
+      String reply = slaveServer.sendXML( xml, RegisterTransServlet.CONTEXT_PATH );
 
       String message =
         BaseMessages.getString( PKG, "SlaveServer.Replay.Info1" )
-          + slaveServer.constructUrl( AddTransServlet.CONTEXT_PATH ) + Const.CR
+          + slaveServer.constructUrl( RegisterTransServlet.CONTEXT_PATH ) + Const.CR
           + BaseMessages.getString( PKG, "SlaveServer.Replay.Info2" ) + Const.CR + Const.CR;
       message += xml;
       message += Const.CR + Const.CR;

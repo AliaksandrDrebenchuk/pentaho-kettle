@@ -473,7 +473,7 @@ public class SlaveServer extends ChangedFlag implements Cloneable, SharedObjectI
 
   // Method is defined as package-protected in order to be accessible by unit tests
   PostMethod buildSendExportMethod( String type, String load, InputStream is ) throws UnsupportedEncodingException {
-    String serviceUrl = AddExportServlet.CONTEXT_PATH;
+    String serviceUrl = RegisterPackageServlet.CONTEXT_PATH;
     if ( type != null && load != null ) {
       serviceUrl +=
         "/?" + AddExportServlet.PARAMETER_TYPE + "=" + type + "&" + AddExportServlet.PARAMETER_LOAD + "="
@@ -539,7 +539,7 @@ public class SlaveServer extends ChangedFlag implements Cloneable, SharedObjectI
         method.releaseConnection();
         if ( log.isDetailed() ) {
           log.logDetailed( BaseMessages.getString( PKG, "SlaveServer.DETAILED_SentExportToService",
-            AddExportServlet.CONTEXT_PATH, environmentSubstitute( hostname ) ) );
+            RegisterPackageServlet.CONTEXT_PATH, environmentSubstitute( hostname ) ) );
         }
       }
     } finally {

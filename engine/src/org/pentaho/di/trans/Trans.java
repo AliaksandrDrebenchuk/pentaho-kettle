@@ -3642,7 +3642,7 @@ public class Trans implements VariableSpace, NamedParams, HasLogChannelInterface
           }
 
           String masterReply =
-            masterServer.sendXML( transConfiguration.getXML(), AddTransServlet.CONTEXT_PATH + "/?xml=Y" );
+            masterServer.sendXML( transConfiguration.getXML(), RegisterTransServlet.CONTEXT_PATH + "/?xml=Y" );
           WebResult webResult = WebResult.fromXMLString( masterReply );
           if ( !webResult.getResult().equalsIgnoreCase( WebResult.STRING_OK ) ) {
             throw new KettleException( "An error occurred sending the master transformation: "
@@ -3689,7 +3689,7 @@ public class Trans implements VariableSpace, NamedParams, HasLogChannelInterface
                 }
 
                 String slaveReply =
-                  slaves[index].sendXML( transConfiguration.getXML(), AddTransServlet.CONTEXT_PATH + "/?xml=Y" );
+                  slaves[index].sendXML( transConfiguration.getXML(), RegisterTransServlet.CONTEXT_PATH + "/?xml=Y" );
                 WebResult webResult = WebResult.fromXMLString( slaveReply );
                 if ( !webResult.getResult().equalsIgnoreCase( WebResult.STRING_OK ) ) {
                   throw new KettleException( "An error occurred sending a slave transformation: "
@@ -4248,7 +4248,7 @@ public class Trans implements VariableSpace, NamedParams, HasLogChannelInterface
         // Now send it off to the remote server...
         //
         String xml = new TransConfiguration( transMeta, executionConfiguration ).getXML();
-        String reply = slaveServer.sendXML( xml, AddTransServlet.CONTEXT_PATH + "/?xml=Y" );
+        String reply = slaveServer.sendXML( xml, RegisterTransServlet.CONTEXT_PATH + "/?xml=Y" );
         WebResult webResult = WebResult.fromXMLString( reply );
         if ( !webResult.getResult().equalsIgnoreCase( WebResult.STRING_OK ) ) {
           throw new KettleException( "There was an error posting the transformation on the remote server: "
