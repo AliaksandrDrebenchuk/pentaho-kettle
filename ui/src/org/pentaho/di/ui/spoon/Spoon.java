@@ -23,40 +23,11 @@
 
 package org.pentaho.di.ui.spoon;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.lang.reflect.Method;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Properties;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.swing.UIManager;
-import javax.swing.plaf.metal.MetalLookAndFeel;
-
 import org.apache.commons.vfs.FileObject;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.window.ApplicationWindow;
@@ -71,6 +42,7 @@ import org.eclipse.swt.browser.LocationListener;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DropTarget;
@@ -333,6 +305,37 @@ import org.pentaho.xul.swt.tab.TabListener;
 import org.pentaho.xul.swt.tab.TabSet;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Properties;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.swing.UIManager;
+import javax.swing.plaf.metal.MetalLookAndFeel;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -8745,44 +8748,61 @@ public class Spoon extends ApplicationWindow implements AddUndoPositionInterface
 
   public boolean messageBox( final String message, final String text, final boolean allowCancel, final int type ) {
 
-    final StringBuffer answer = new StringBuffer( "N" );
+    final boolean[] answer = { false };
 
     display.syncExec( new Runnable() {
 
       @Override
       public void run() {
 
-        int flags = SWT.OK;
+        int dialogType = MessageDialog.INFORMATION;
+
+        List<String> buttons = new ArrayList<>();
+        buttons.add( IDialogConstants.OK_LABEL );
+
         if ( allowCancel ) {
-          flags |= SWT.CANCEL;
+          buttons.add( IDialogConstants.CANCEL_LABEL );
         }
 
         switch ( type ) {
-          case Const.INFO:
-            flags |= SWT.ICON_INFORMATION;
-            break;
           case Const.ERROR:
-            flags |= SWT.ICON_ERROR;
+            dialogType = MessageDialog.ERROR;
             break;
           case Const.WARNING:
-            flags |= SWT.ICON_WARNING;
-            break;
-          default:
+            dialogType = MessageDialog.WARNING;
             break;
         }
+        
+        String[] buttonArray = buttons.toArray( new String[ buttons.size() ]);
+        
+        org.eclipse.jface.dialogs.MessageDialog dialog =
+            new org.eclipse.jface.dialogs.MessageDialog( shell, text, null, message, dialogType, buttonArray ,
+                0 ) {
 
-        MessageBox mb = new MessageBox( shell, flags );
-        // Set the Body Message
-        mb.setMessage( message );
-        // Set the title Message
-        mb.setText( text );
-        if ( mb.open() == SWT.OK ) {
-          answer.setCharAt( 0, 'Y' );
-        }
+              @Override
+              protected Control createContents( Composite parent ) {
+                // props.setLook( parent );
+                super.createContents( parent );
+                props.setLook( getShell() );
+                props.setLook( imageLabel );
+                props.setLook( messageLabel );
+                return parent;
+              }
+
+              @Override
+              protected Control createCustomArea( Composite parent ) {
+                Composite composite = new Composite( parent, SWT.NONE );
+                composite.setLayout( new StackLayout() );
+                return composite;
+              }
+            };
+
+        answer[0] = dialog.open() == IStatus.OK; // need to test
+
       }
     } );
 
-    return "Y".equalsIgnoreCase( answer.toString() );
+    return answer[0];
   }
 
   /**
@@ -9236,4 +9256,5 @@ public class Spoon extends ApplicationWindow implements AddUndoPositionInterface
     AuthProviderDialog authProviderDialog = new AuthProviderDialog( shell );
     authProviderDialog.show();
   }
+
 }
