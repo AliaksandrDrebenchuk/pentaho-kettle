@@ -83,6 +83,15 @@ public class XMLHandler {
   private static final SimpleDateFormat simpleTimeStampFormat = new SimpleDateFormat(
       ValueMeta.DEFAULT_TIMESTAMP_FORMAT_MASK );
 
+  private static Encoder encoder = null;
+
+  private static Encoder getEncoder() {
+    if ( encoder == null ) {
+      encoder = ESAPI.encoder();
+    }
+    return encoder;
+  }
+
   /**
    * The header string to specify encoding in UTF-8 for XML files
    * 
@@ -772,18 +781,17 @@ public class XMLHandler {
    */
   public static String addTagValue( String tag, String val, boolean cr, String... attributes ) {
     StringBuffer value;
-    Encoder encoder = ESAPI.encoder();
     value = new StringBuffer( "<" );
     value.append( tag );
 
     for ( int i = 0; i < attributes.length; i += 2 ) {
-      value.append( " " ).append( encoder.encodeForXMLAttribute( attributes[i] ) ).append( "=\"" ).append(
+      value.append( " " ).append( getEncoder().encodeForXMLAttribute( attributes[i] ) ).append( "=\"" ).append(
           attributes[i + 1] ).append( "\" " );
     }
 
     if ( val != null && val.length() > 0 ) {
       value.append( '>' );
-      value.append( encoder.encodeForXML( val ) );
+      value.append( getEncoder().encodeForXML( val ) );
 
       value.append( "</" );
       value.append( tag );
@@ -809,13 +817,11 @@ public class XMLHandler {
    *          the string to "encode"
    */
   public static void appendReplacedChars( StringBuffer value, String string ) {
-    Encoder encoder = ESAPI.encoder();
-    value.append( encoder.encodeForXML( string ) );
+    value.append( getEncoder().encodeForXML( string ) );
   }
 
   public static void appendReplacedChars( StringBuilder value, String string ) {
-    Encoder encoder = ESAPI.encoder();
-    value.append( encoder.encodeForXML( string ) );
+    value.append( getEncoder().encodeForXML( string ) );
   }
 
   /**
